@@ -6,9 +6,17 @@ const RatingSchema = new Schema(
   {
     rating: {
       type: Number,
+      max: 5,
+      min: 1,
+      required: true,
     },
     text: {
       type: String,
+      required: true,
+    },
+    author: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
     },
   },
   {

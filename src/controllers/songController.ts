@@ -1,10 +1,5 @@
 import { NextFunction, Response, Request } from "express";
-import Song from "../models/song";
-
-// interface rating {
-//   rating?: Number;
-//   text?: String;
-// }
+import Song from "../models/Song";
 
 const getSongs = async (
   req: Request,

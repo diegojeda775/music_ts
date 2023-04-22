@@ -28,15 +28,17 @@ const SongSchema = new Schema(
   {
     songTitle: {
       type: String,
-      require: true,
+      required: true,
       maxLength: 30,
     },
     artist: {
       type: String,
-      require: true,
+      unique: true,
+      required: true,
     },
     genre: {
       type: String,
+      required: true,
     },
     ratings: [RatingSchema],
   },

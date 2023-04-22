@@ -5,7 +5,7 @@ const Schema = mongoose.Schema;
 
 const UserSchema = new Schema(
   {
-    username: {
+    userName: {
       type: String,
       unique: true,
       required: true,
@@ -14,9 +14,11 @@ const UserSchema = new Schema(
     firstName: {
       type: String,
       required: true,
+      maxLength: 10,
     },
     lastName: {
       type: String,
+      maxLength: 10,
       required: true,
     },
     email: {
@@ -30,10 +32,12 @@ const UserSchema = new Schema(
       validate: (password: string) => validator.isStrongPassword(password),
     },
     age: {
+      required: true,
       type: Number,
     },
     gender: {
       type: String,
+      required: true,
       enum: ["Male", "Female", "female", "male"],
     },
   },
@@ -41,5 +45,13 @@ const UserSchema = new Schema(
     timestamps: true,
   }
 );
+
+UserSchema.pre("save", function (next) {
+  this.userName = this.userName.trim();
+  this.firstName = this.firstName.trim();
+  this.lastName = this.lastName.trim();
+
+  next();
+});
 
 export default mongoose.model("User", UserSchema);

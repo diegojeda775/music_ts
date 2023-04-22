@@ -1,13 +1,38 @@
 import { NextFunction, Response, Request } from "express";
 import Song from "../models/Song";
 
+interface FilterObj {
+  songTitle?: any;
+  artist?: any;
+  genre?: any;
+}
+
+interface OptionsObj {
+  limit?: any;
+  sort?: any;
+}
+
 const getSongs = async (
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
+  const filter: FilterObj = {};
+  const options: OptionsObj = {};
+  const { songTitle, artist, genre, limit, sortByArtist } = req.query;
+
+  if (songTitle) filter.songTitle = songTitle;
+  if (artist) filter.artist = artist;
+  if (genre) filter.genre = genre;
+
+  if (limit) options.limit = limit;
+  if (sortByArtist)
+    options.sort = {
+      artist: sortByArtist === "asc" ? 1 : -1,
+    };
+
   try {
-    const songs = await Song.find();
+    const songs = await Song.find({}, filter, options);
 
     res.status(200).setHeader("Content-Type", "application/json").json(songs);
   } catch (err) {

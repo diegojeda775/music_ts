@@ -16,6 +16,9 @@ const ArtistSchema = new Schema({
   genre: {
     type: String,
   },
+  image: {
+    type: String,
+  },
 });
 
 export default mongoose.model("Artist", ArtistSchema);

@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import Artist from "../models/Artist";
+import path from "path";
 
 interface FilterObj {
   firstName?: any;
@@ -19,18 +20,19 @@ const getArtists = async (
 ): Promise<void> => {
   const filter: FilterObj = {};
   const options: OptionsObj = {};
-  const { firstName, lastName, genre, limit, sortByGenre } = req.query;
+  if (Object.keys(req.query).length) {
+    const { firstName, lastName, genre, limit, sortByGenre } = req.query;
 
-  if (firstName) filter.firstName = firstName;
-  if (lastName) filter.lastName = lastName;
-  if (genre) filter.genre = genre;
+    if (firstName) filter.firstName = firstName;
+    if (lastName) filter.lastName = lastName;
+    if (genre) filter.genre = genre;
 
-  if (limit) options.limit = limit;
-  if (sortByGenre)
-    options.sort = {
-      genre: sortByGenre === "asc" ? 1 : -1,
-    };
-
+    if (limit) options.limit = limit;
+    if (sortByGenre)
+      options.sort = {
+        genre: sortByGenre === "asc" ? 1 : -1,
+      };
+  }
   try {
     const artists = await Artist.find({}, filter, options);
 
@@ -124,6 +126,43 @@ const deleteArtist = async (
         message: `Success! Deleted artist with id: ${req.params.id}`,
         deletedArtist,
       });
+  } catch (err) {
+    next(err);
+  }
+};
+
+const postArtistImage = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    if (!req.files) throw new Error("Missing Image!");
+
+    const file: any = req.files.file;
+
+    if (!file.mimetype.startsWith("image"))
+      throw new Error("Please upload image file type!");
+
+    if (file.size > process.env.MAX_FILE_SIZE!)
+      throw new Error(`Image exceeds size of ${process.env.MAX_FILE_SIZE}`);
+
+    file.name = `photo_${req.params.artistId}${path.parse(file.name).ext}`;
+
+    const filePath = process.env.FILE_UPLOAD_PATH + file.name;
+
+    file.mv(filePath, async (err: any) => {
+      if (err) throw new Error("Problem Uploading Photo");
+
+      await Artist.findByIdAndUpdate(req.params.artistId, { image: file.name });
+
+      res
+        .status(201)
+        .setHeader("Content-Type", "application/json")
+        .json({
+          message: `Image successfully uploaded for artists with id: ${req.params.artistId} `,
+        });
+    });
   } catch (err) {
     next(err);
   }

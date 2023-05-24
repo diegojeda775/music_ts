@@ -7,6 +7,8 @@ import artist from "./routes/artist";
 import user from "./routes/user";
 import logger from "./middlewares/logger";
 import errorHandler from "./middlewares/errorHandler";
+import cookieParser from "cookie-parser";
+import fileUpload from "express-fileupload";
 
 dotenv.config({ path: "./src/config/config.env" });
 
@@ -16,6 +18,8 @@ const app = express();
 
 app.use(bodyParser.json());
 
+app.use(cookieParser());
+app.use(fileUpload());
 app.use(logger);
 app.use(errorHandler);
 app.use("/song", song);

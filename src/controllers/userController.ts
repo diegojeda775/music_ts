@@ -14,17 +14,18 @@ interface optionsObj {
 const getUsers = async (req: Request, res: Response, next: NextFunction) => {
   const filter: filterObj = {};
   const options: optionsObj = {};
-  const { userName, age, limit, sortByAge } = req.query;
+  if (Object.keys(req.query).length) {
+    const { userName, age, limit, sortByAge } = req.query;
 
-  if (userName) filter.userName = userName;
-  if (age) filter.age = age;
+    if (userName) filter.userName = userName;
+    if (age) filter.age = age;
 
-  if (limit) options.limit = limit;
-  if (sortByAge)
-    options.sort = {
-      age: sortByAge === "asc" ? 1 : -1,
-    };
-
+    if (limit) options.limit = limit;
+    if (sortByAge)
+      options.sort = {
+        age: sortByAge === "asc" ? 1 : -1,
+      };
+  }
   try {
     const users = await User.find({}, filter, options);
 

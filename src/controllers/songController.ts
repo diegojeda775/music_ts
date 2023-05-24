@@ -19,17 +19,19 @@ const getSongs = async (
 ): Promise<void> => {
   const filter: FilterObj = {};
   const options: OptionsObj = {};
-  const { songTitle, artist, genre, limit, sortByArtist } = req.query;
+  if (Object.keys(req.query).length) {
+    const { songTitle, artist, genre, limit, sortByArtist } = req.query;
 
-  if (songTitle) filter.songTitle = songTitle;
-  if (artist) filter.artist = artist;
-  if (genre) filter.genre = genre;
+    if (songTitle) filter.songTitle = songTitle;
+    if (artist) filter.artist = artist;
+    if (genre) filter.genre = genre;
 
-  if (limit) options.limit = limit;
-  if (sortByArtist)
-    options.sort = {
-      artist: sortByArtist === "asc" ? 1 : -1,
-    };
+    if (limit) options.limit = limit;
+    if (sortByArtist)
+      options.sort = {
+        artist: sortByArtist === "asc" ? 1 : -1,
+      };
+  }
 
   try {
     const songs = await Song.find({}, filter, options);
